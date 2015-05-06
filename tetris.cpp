@@ -1,17 +1,24 @@
 #include "tetris.hpp"
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 
 
 /////// iBlock stuff ///////
 
-iBlock::iBlock()
- : id(std::rand() % 7) { set_block(); };
+iBlock::iBlock() {
+    std::srand(std::time(0));
+    id = std::rand() % 7;
+    set_block();
+};
 
 // Input is number 0-6, to determine kind of block.
 iBlock::iBlock(short i) : id(i) { set_block(); };
 
 void iBlock::set_block() {
+
+    clear_grid();
+    
 	switch (id) {
 		// I
         case 0:
@@ -277,6 +284,9 @@ short sidebar::get_nextBlock_id() const {
 /////// END sidebar stuff ///////
 
 /////// tetrisGame stuff ///////
+
+tetrisGame::tetrisGame()
+ : well(playField()), sbar(sidebar()) {};
 
 void tetrisGame::rotate_left() {
     well.rotate(true);
