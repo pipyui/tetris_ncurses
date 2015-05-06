@@ -10,7 +10,7 @@ constexpr short BLOCK_SIZE = 4;     // Max dimensions of iBlock
 
 // Abstraction for single brick.
 enum color_block_t {
-    EMPTY,
+    EMPTY,      // EMPTY must be first so new color_block_t's initialize as it.
     GREY,
     RED,
     GREEN,
@@ -57,7 +57,7 @@ private:
     short currentX;
     short currentY;
 
-    void build_well();
+    void build_well();  // Will be used by constructor only.
 
 public:
     playField();
@@ -76,6 +76,7 @@ public:
     bool check_full_row(short) const;
     void clear_row(short);
     void new_block();
+    void new_block(short);
 
     color_block_t block_at(short, short) const;
 };
@@ -91,6 +92,26 @@ public:
     int bump_score();
     int get_score() const;
     short get_nextBlock_id() const;
+    void new_block();
+};
+
+class tetrisGame {
+public:
+    playField well;
+    sidebar sbar;
+
+    tetrisGame();
+    ~tetrisGame();
+
+    void rotate_left();
+    void rotate_right();
+    void move_left();
+    void move_right();
+    bool move_down();
+    void hard_down();
+
+
+    void clear_row(short);
     void new_block();
 };
 
