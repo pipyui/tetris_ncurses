@@ -1,173 +1,30 @@
+#include "ncurses_wrapper.hpp"
 #include "tetris.hpp"
-#include <cstdlib>
-#include <cstring>
+#include <ncurses.h>
 
 
-// iBlock stuff
-iBlock::iBlock()
- : id(std::rand() % 7) { setBlock(); };
+WINDOW* create_window(int height, int width, int starty, int startx) {
+	WINDOW *new_window;
 
-// Input is number 0-6, to determine kind of block.
-iBlock::iBlock(short i) : id(i) { setBlock(); };
+	new_window = newwin(height, width, starty, startx);
+	box(new_window, 0 , 0);
 
-void iBlock::setBlock() {
-	switch (id) {
-		// I
-        case 0:
-            blocks.grid[0][0] = RED;
-            blocks.grid[1][0] = RED;
-            blocks.grid[2][0] = RED;
-            blocks.grid[3][0] = RED;
-        	break;
-        // J
-        case 1:
-            blocks.grid[0][0] = GREEN;
-            blocks.grid[1][0] = GREEN;
-            blocks.grid[1][1] = GREEN;
-            blocks.grid[1][2] = GREEN;
-        	break;
-        // L
-        case 2:
-            blocks.grid[0][2] = BLUE;
-            blocks.grid[1][0] = BLUE;
-            blocks.grid[1][1] = BLUE;
-            blocks.grid[1][2] = BLUE;
-        	break;
-        // O
-        case 3:
-            blocks.grid[0][0] = YELLOW;
-            blocks.grid[0][1] = YELLOW;
-            blocks.grid[1][0] = YELLOW;
-            blocks.grid[1][1] = YELLOW;
-        	break;
-        // S
-        case 4:
-            blocks.grid[0][1] = PURPLE;
-            blocks.grid[0][2] = PURPLE;
-            blocks.grid[1][0] = PURPLE;
-            blocks.grid[1][1] = PURPLE;
-        	break;
-        // T
-        case 5:
-            blocks.grid[0][1] = ORANGE;
-            blocks.grid[1][0] = ORANGE;
-            blocks.grid[1][1] = ORANGE;
-            blocks.grid[1][2] = ORANGE;
-        	break;
-        // Z
-        case 6:
-            blocks.grid[0][0] = LIGHT_BLUE;
-            blocks.grid[0][1] = LIGHT_BLUE;
-            blocks.grid[1][1] = LIGHT_BLUE;
-            blocks.grid[1][2] = LIGHT_BLUE;
-        	break;
-        default:
-        	break;
-   }
+	return new_window;
 }
 
-void iBlock::rejustify() {
-    while (empty_row(0))
-        delete_row(0);
-    while (empty_col(0))
-        delete_col(0);
+ncurses_wrapper::ncurses_wrapper()
+ : field(create_window(WELL_HEIGHT, WELL_WIDTH, 1, 0)),
+   bar(create_window(WELL_HEIGHT, SIDEBAR_WIDTH, 1, WELL_WIDTH + 1)) {};
+
+ncurses_wrapper::~ncurses_wrapper() {
+	delwin(field);
+	delwin(bar);
+};
+
+void ncurses_wrapper::draw_playField(playField &pf) {
+
 }
 
-// All used by rejustify()
-bool iBlock::empty_row(short r) const {
-    for (short j = 0; j < BLOCK_SIZE; ++j)
-        if (blocks.grid[r][j] != EMPTY)
-            return false;
-    return true;
+void ncurses_wrapper::draw_sidebar(sidebar &sb) {
+
 }
-
-bool iBlock::empty_col(short c) const {
-    for (short i = 0; i < BLOCK_SIZE; ++i)
-        if (blocks.grid[i][c] != EMPTY)
-            return false;
-    return true;
-}
-
-void iBlock::delete_row(short r) {
-    for (short i = r; i < BLOCK_SIZE - 1; ++i)
-        for (short j = 0; j < BLOCK_SIZE; ++j)
-            blocks.grid[i][j] = blocks.grid[i + 1][j];
-    for (short j = 0; j < BLOCK_SIZE; ++j)
-        blocks.grid[BLOCK_SIZE - 1][j] = EMPTY;
-}
-
-void iBlock::delete_col(short c) {
-    for (short j = c; j < BLOCK_SIZE - 1; ++j)
-        for (short i = 0; i < BLOCK_SIZE; ++i)
-            blocks.grid[i][j] = blocks.grid[i][j + 1];
-    for (short i = 0; i < BLOCK_SIZE; ++i)
-        blocks.grid[i][BLOCK_SIZE - 1] = EMPTY;
-}
-// END all used by rejustify()
-
-void iBlock::clearGrid() {
-	for (short i = 0; i < BLOCK_SIZE; ++i)
-		for (short j = 0; j < BLOCK_SIZE; ++j)
-			blocks.grid[i][j] = EMPTY;
-}
-
-grid_box iBlock::getBlocks() const {
-    return blocks;
-}
-
-
-// playField stuff
-playField::playField()
- : currentBlock(iBlock()), currentX(0), currentY(0) { build_well(); };
-
-void playField::build_well() {
-    for (short i = 0; i < WELL_HEIGHT; ++i) {
-        gameGrid[i][0] = GREY;
-        gameGrid[i][WELL_WIDTH - 1] = GREY;
-    }
-    for (short i = 0; i < WELL_WIDTH; ++i)
-        gameGrid[WELL_HEIGHT - 1][i] = GREY;
-}
-
-void playField::rotate(bool left) {
-    iBlock rotated = iBlock(-1); // Produces empty iBlock
-    rotated.id = currentBlock.id;
-
-    // Initial rotation
-    for (short i = 0; i < BLOCK_SIZE; ++i){ // rotates original onto copy
-        for (short j = 0; j < BLOCK_SIZE; ++j) {
-            if (left)
-                rotated.blocks.grid[i][j] = currentBlock.blocks.grid[3-j][i];
-            else
-                rotated.blocks.grid[i][j] = currentBlock.blocks.grid[j][3-i];
-        }
-    }
-
-    // Realign iBlock blocks with top-left corner of its grid.
-    rotated.rejustify();
-
-    // if this rotates it off the grid or onto another piece, we need to move it back
-    for (short i = 0; i < BLOCK_SIZE; ++i)
-        for (short j = 0; j < BLOCK_SIZE; ++j)
-            if (rotated.blocks.grid[i][j] != EMPTY)
-                return;
-
-    std::memcpy(&currentBlock.blocks.grid, &rotated.blocks.grid, sizeof(color_block_t) * BLOCK_SIZE * BLOCK_SIZE);
-}
-
-bool playField::checkCollision() const {
-    for (short j = BLOCK_SIZE - 1; j >= 0; --j)
-        for (short i = 0; i < BLOCK_SIZE; ++i)
-            if (currentBlock.blocks.grid[i][j] != EMPTY && gameGrid[currentX + i][currentY + j] != EMPTY)
-                return true;
-    return false;
-}
-
-color_block_t playField::block_at(short x, short y) const {
-    return gameGrid[x][y];
-}
-
-
-// sidebar stuff
-sidebar::sidebar()
- : score(0), nextBlock(iBlock()) {};
