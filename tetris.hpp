@@ -47,6 +47,7 @@ public:
 	void setBlock();
     void clearGrid();
     grid_box getBlocks() const;
+    short get_id() const;
 };
 
 class playField {
@@ -66,14 +67,15 @@ public:
     void rotate(bool);
     void move_left();
     void move_right();
-    void move_down();
+    bool move_down();
     void hard_down();
 
     void settle_block();
 
     bool check_collision() const;
-    bool full_row(short) const;
+    bool check_full_row(short) const;
     void clear_row(short);
+    void new_block();
 
     color_block_t block_at(short, short) const;
 };
@@ -86,6 +88,10 @@ private:
 public:
     sidebar();
     ~sidebar();
+    int bump_score();
+    int get_score() const;
+    short get_nextBlock_id() const;
+    void new_block();
 };
 
 #endif
