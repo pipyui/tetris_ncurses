@@ -6,12 +6,12 @@
 /////// iBlock stuff ///////
 
 iBlock::iBlock()
- : id(std::rand() % 7) { setBlock(); };
+ : id(std::rand() % 7) { set_block(); };
 
 // Input is number 0-6, to determine kind of block.
-iBlock::iBlock(short i) : id(i) { setBlock(); };
+iBlock::iBlock(short i) : id(i) { set_block(); };
 
-void iBlock::setBlock() {
+void iBlock::set_block() {
 	switch (id) {
 		// I
         case 0:
@@ -74,7 +74,7 @@ void iBlock::rejustify() {
         delete_col(0);
 }
 
-// All used by rejustify()
+// All used by rejustify() //
 bool iBlock::empty_row(short r) const {
     for (short j = 0; j < BLOCK_SIZE; ++j)
         if (blocks.grid[r][j] != EMPTY)
@@ -104,15 +104,15 @@ void iBlock::delete_col(short c) {
     for (short i = 0; i < BLOCK_SIZE; ++i)
         blocks.grid[i][BLOCK_SIZE - 1] = EMPTY;
 }
-// END all used by rejustify()
+// END all used by rejustify() //
 
-void iBlock::clearGrid() {
+void iBlock::clear_grid() {
 	for (short i = 0; i < BLOCK_SIZE; ++i)
 		for (short j = 0; j < BLOCK_SIZE; ++j)
 			blocks.grid[i][j] = EMPTY;
 }
 
-grid_box iBlock::getBlocks() const {
+grid_box iBlock::get_blocks() const {
     return blocks;
 }
 
@@ -235,6 +235,18 @@ color_block_t playField::block_at(short x, short y) const {
     return gameGrid[x][y];
 }
 
+iBlock playField::get_currentBlock() const {
+    return currentBlock;
+}
+
+short playField::get_currentX() const {
+    return currentX;
+}
+
+short playField::get_currentY() const {
+    return currentY;
+}
+
 /////// END playField stuff ///////
 
 ///////// sidebar stuff ///////
@@ -246,16 +258,20 @@ int sidebar::bump_score() {
     return score += 10;
 }
 
+void sidebar::new_block() {
+    nextBlock = iBlock();
+}
+
 int sidebar::get_score() const {
     return score;
 }
 
-short sidebar::get_nextBlock_id() const {
-    return nextBlock.get_id();
+iBlock sidebar::get_nextBlock() const {
+    return nextBlock;
 }
 
-void sidebar::new_block() {
-    nextBlock = iBlock();
+short sidebar::get_nextBlock_id() const {
+    return nextBlock.get_id();
 }
 
 /////// END sidebar stuff ///////
