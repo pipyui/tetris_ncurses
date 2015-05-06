@@ -187,7 +187,6 @@ bool playField::move_down() {
 void playField::hard_down() {
     while (move_down());
 }
-// ---- END Block movement ---- //
 
 void playField::settle_block() {
     for (short i = 0; i < BLOCK_SIZE; ++i)
@@ -195,6 +194,7 @@ void playField::settle_block() {
             if (currentBlock.blocks.grid[i][j] != EMPTY)
                 gameGrid[currentX + i][currentY + j - 1] = currentBlock.blocks.grid[i][j];
 }
+// ---- END Block movement ---- //
 
 bool playField::check_collision() const {
     for (short j = BLOCK_SIZE - 1; j >= 0; --j)
@@ -220,7 +220,15 @@ void playField::clear_row(short r) {
 }
 
 void playField::new_block() {
-    
+    currentBlock = iBlock();
+    currentX = std::rand() % (WELL_WIDTH - 2) + 1;
+    currentY = 0;
+}
+
+void playField::new_block(short nextBlockId) {
+    currentBlock = iBlock(nextBlockId);
+    currentX = std::rand() % (WELL_WIDTH - 2) + 1;
+    currentY = 0;
 }
 
 color_block_t playField::block_at(short x, short y) const {
@@ -251,3 +259,42 @@ void sidebar::new_block() {
 }
 
 /////// END sidebar stuff ///////
+
+/////// tetrisGame stuff ///////
+
+void tetrisGame::rotate_left() {
+    well.rotate(true);
+}
+
+void tetrisGame::rotate_right() {
+    well.rotate(false);
+}
+
+void tetrisGame::move_left() {
+    well.move_left();
+}
+
+void tetrisGame::move_right() {
+    well.move_right();
+}
+
+bool tetrisGame::move_down() {
+    return well.move_down();
+}
+
+void tetrisGame::hard_down() {
+    well.hard_down();
+}
+
+
+void tetrisGame::clear_row(short r) {
+    well.clear_row(r);
+    sbar.bump_score();
+}
+
+void tetrisGame::new_block() {
+    well.new_block(sbar.get_nextBlock_id());
+    sbar.new_block();
+}
+
+/////// END tetrisGame stuff ///////
