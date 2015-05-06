@@ -6,10 +6,23 @@
 
 constexpr short WELL_HEIGHT = 21;   // 20 + 1 bottom collider
 constexpr short WELL_WIDTH = 12;    // 10 + 2 side colliders
-constexpr short BLOCK_SIZE = 3;
+constexpr short BLOCK_SIZE = 4;     // Max dimensions of iBlock
+
+// Abstraction for single brick.
+enum color_block_t {
+    EMPTY,
+    GREY,
+    RED,
+    GREEN,
+    BLUE,
+    YELLOW,
+    PURPLE,
+    ORANGE,
+    LIGHT_BLUE
+};
 
 struct grid_box {
-    short grid[BLOCK_SIZE][BLOCK_SIZE];
+    color_block_t grid[BLOCK_SIZE][BLOCK_SIZE];
 };
 
 class iBlock {
@@ -18,6 +31,12 @@ class iBlock {
 private:
 	short id; // Piece id, used to indicate what kind of block it is.
 	grid_box blocks;
+
+    void rejustify();
+    bool empty_row(short) const;
+    bool empty_col(short) const;
+    void delete_row(short);
+    void delete_col(short);
 
 public:
     iBlock();
@@ -32,8 +51,10 @@ public:
 
 class playField {
 private:
-	short gameGrid[WELL_HEIGHT][WELL_WIDTH];
+	color_block_t gameGrid[WELL_HEIGHT][WELL_WIDTH];
 	iBlock currentBlock;
+    short currentX;
+    short currentY;
 
     void build_well();
 
@@ -48,8 +69,9 @@ public:
     void move_down();
     void hard_down();
 
-    bool check_collision();
-    void clear_row(int);
+    color_block_t block_at(short, short) const;
+    bool check_collision() const;
+    void clear_row(short);
 };
 
 class sidebar {
