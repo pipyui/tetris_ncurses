@@ -31,8 +31,20 @@ int get_color(color_block_t blockColor) {
     	case LIGHT_BLUE:
     		return 8;
     	default:
-    		return 0;
+    		return 9;
 	}
+}
+
+void instantialize_color_pairs() {
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_RED, COLOR_BLACK);
+	init_pair(3, COLOR_GREEN, COLOR_BLACK);
+	init_pair(4, COLOR_BLUE, COLOR_BLACK);
+	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(7, COLOR_WHITE, COLOR_BLACK);
+	init_pair(8, COLOR_CYAN, COLOR_BLACK);
+	init_pair(9, COLOR_BLACK, COLOR_BLACK);
 }
 
 ncurses_wrapper::ncurses_wrapper()
@@ -46,17 +58,23 @@ ncurses_wrapper::~ncurses_wrapper() {
 
 void ncurses_wrapper::draw_playField(playField &pf) {
 	werase(field);
-
+	box(field, 0, 0);
+	wrefresh(field);
 }
 
 void ncurses_wrapper::draw_sidebar(sidebar &sb) {
 	werase(bar);
+	box(bar, 0, 0);
 	iBlock next = sb.get_nextBlock();
 	grid_box preview = next.get_blocks();
 	int score = sb.get_score();
 
-	for (short i = 0; i < BLOCK_SIZE; ++i)
-		for (short j = 0; j < BLOCK_SIZE; ++j)
+	for (short i = 0; i < BLOCK_SIZE; ++i) {
+		for (short j = 0; j < BLOCK_SIZE; ++j) {
 			if (preview.grid[i][j] != EMPTY)
-				waddch( bar, '#' | COLOR_PAIR(get_color(preview.grid[i][j])) );
+				mvwaddch( bar, i + 1, j + 1, '#' | COLOR_PAIR(get_color(preview.grid[i][j])) );
+		}
+	}
+	mvwprintw( bar, WELL_HEIGHT - 3, 5, "Score: %d", score);
+	wrefresh(bar);
 }
