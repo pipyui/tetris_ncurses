@@ -69,9 +69,13 @@ public:
     void move_down();
     void hard_down();
 
-    color_block_t block_at(short, short) const;
+    void settle_block();
+
     bool check_collision() const;
+    bool full_row(short) const;
     void clear_row(short);
+
+    color_block_t block_at(short, short) const;
 };
 
 class sidebar {
