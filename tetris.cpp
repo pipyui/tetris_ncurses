@@ -3,7 +3,8 @@
 #include <cstring>
 
 
-// iBlock stuff
+/////// iBlock stuff ///////
+
 iBlock::iBlock()
  : id(std::rand() % 7) { setBlock(); };
 
@@ -115,7 +116,10 @@ grid_box iBlock::getBlocks() const {
     return blocks;
 }
 
-// playField stuff
+/////// END iBlock stuff ///////
+
+/////// playField stuff ///////
+
 playField::playField()
  : currentBlock(iBlock()), currentX(0), currentY(0) { build_well(); };
 
@@ -146,24 +150,46 @@ void playField::rotate(bool left) {
     rotated.rejustify();
 
     // if this rotates it off the grid or onto another piece, we need to move it back
-    for (short i = 0; i < BLOCK_SIZE; ++i){
-        for (short j = 0; j < BLOCK_SIZE; ++j) {
-            if (rotated.blocks.grid[i][j] != EMPTY) {
-                if (block_at(currentX + i, currentY + j) == GREY)
-                    if (currentX + i == WELL_WIDTH - 1)
-                        --currentX;
-                
-            }
-        }
-    }
+    for (short i = 0; i < BLOCK_SIZE; ++i)
+        for (short j = 0; j < BLOCK_SIZE; ++j)
+            if (rotated.blocks.grid[i][j] != EMPTY)
+                return;
 
     std::memcpy(&currentBlock.blocks.grid, &rotated.blocks.grid, sizeof(color_block_t) * BLOCK_SIZE * BLOCK_SIZE);
+}
+
+bool playField::check_collision() const {
+    for (short j = BLOCK_SIZE - 1; j >= 0; --j)
+        for (short i = 0; i < BLOCK_SIZE; ++i)
+            if (currentBlock.blocks.grid[i][j] != EMPTY && gameGrid[currentX + i][currentY + j] != EMPTY)
+                return true;
+    return false;
+}
+
+bool playField::full_row(short r) const {
+    for (short j = 1; j < WELL_WIDTH - 1; ++j)
+        if (gameGrid[r][j] == EMPTY)
+            return false;
+    return true;
+}
+
+void playField::clear_row(short r) {
+    for (short i = r; i > 0; --i)
+        for (short j = 1; j < WELL_WIDTH - 1; ++j)
+            gameGrid[i][j] = gameGrid[i - 1][j];
+    for (short j = 1; j < WELL_WIDTH - 1; ++j)
+        gameGrid[0][j] = EMPTY;
 }
 
 color_block_t playField::block_at(short x, short y) const {
     return gameGrid[x][y];
 }
 
-// sidebar stuff
+/////// END playField stuff ///////
+
+///////// sidebar stuff ///////
+
 sidebar::sidebar()
  : score(0), nextBlock(iBlock()) {};
+
+/////// END sidebar stuff ///////
