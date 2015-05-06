@@ -51,6 +51,7 @@ public:
 };
 
 class playField {
+    friend class ncurses_wrapper;
 private:
 	color_block_t gameGrid[WELL_HEIGHT][WELL_WIDTH];
 	iBlock currentBlock;
@@ -72,6 +73,7 @@ public:
 
     void settle_block();
 
+    void clear_grid();
     bool check_collision() const;
     bool check_full_row(short) const;
     void clear_row(short);
