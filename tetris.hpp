@@ -44,9 +44,9 @@ public:
     // Input is number 0-6, to determine kind of block.
     iBlock(short);
 
-	void setBlock();
-    void clearGrid();
-    grid_box getBlocks() const;
+	void set_block();
+    void clear_grid();
+    grid_box get_blocks() const;
     short get_id() const;
 };
 
@@ -79,6 +79,9 @@ public:
     void new_block(short);
 
     color_block_t block_at(short, short) const;
+    iBlock get_currentBlock() const;
+    short get_currentX() const;
+    short get_currentY() const;
 };
 
 class sidebar {
@@ -90,9 +93,11 @@ public:
     sidebar();
     ~sidebar();
     int bump_score();
-    int get_score() const;
-    short get_nextBlock_id() const;
     void new_block();
+
+    int get_score() const;
+    iBlock get_nextBlock() const;
+    short get_nextBlock_id() const;
 };
 
 class tetrisGame {
