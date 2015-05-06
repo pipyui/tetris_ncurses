@@ -135,6 +135,8 @@ playField::playField()
  : currentBlock(iBlock()), currentX(0), currentY(0) { build_well(); };
 
 void playField::build_well() {
+    clear_grid();
+    
     for (short i = 0; i < WELL_HEIGHT; ++i) {
         gameGrid[i][0] = GREY;
         gameGrid[i][WELL_WIDTH - 1] = GREY;
@@ -202,6 +204,12 @@ void playField::settle_block() {
                 gameGrid[currentX + i][currentY + j - 1] = currentBlock.blocks.grid[i][j];
 }
 // ---- END Block movement ---- //
+
+void playField::clear_grid() {
+    for (short i = 0; i < WELL_HEIGHT; ++i)
+        for (short j = 0; j < WELL_WIDTH; ++j)
+            gameGrid[i][j] = EMPTY;
+}
 
 bool playField::check_collision() const {
     for (short j = BLOCK_SIZE - 1; j >= 0; --j)
