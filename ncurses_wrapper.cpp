@@ -1,26 +1,30 @@
-#ifndef NCURSES_WRAPPER_HPP
-#define NCURSES_WRAPPER_HPP
-
 #include "ncurses_wrapper.hpp"
 #include "tetris.hpp"
 #include <ncurses.h>
 
 
-constexpr short SIDEBAR_WIDTH = 20;
+WINDOW* create_window(int height, int width, int starty, int startx) {
+	WINDOW *new_window;
 
-WINDOW* create_window(int height, int width, int starty, int startx);
+	new_window = newwin(height, width, starty, startx);
+	box(new_window, 0 , 0);
 
-class ncurses_wrapper {
-private:
-	WINDOW *field;
-	WINDOW *bar;
+	return new_window;
+}
 
-public:
-	ncurses_wrapper();
-	~ncurses_wrapper();
+ncurses_wrapper::ncurses_wrapper()
+ : field(create_window(WELL_HEIGHT, WELL_WIDTH, 1, 0)),
+   bar(create_window(WELL_HEIGHT, SIDEBAR_WIDTH, 1, WELL_WIDTH + 1)) {};
 
-	void draw_playField(playField &);
-	void draw_sidebar(sidebar &);
+ncurses_wrapper::~ncurses_wrapper() {
+	delwin(field);
+	delwin(bar);
 };
 
-#endif
+void ncurses_wrapper::draw_playField(playField &pf) {
+
+}
+
+void ncurses_wrapper::draw_sidebar(sidebar &sb) {
+
+}
