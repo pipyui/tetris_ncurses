@@ -116,6 +116,10 @@ grid_box iBlock::getBlocks() const {
     return blocks;
 }
 
+short iBlock::get_id() const {
+    return id;
+}
+
 /////// END iBlock stuff ///////
 
 /////// playField stuff ///////
@@ -132,6 +136,7 @@ void playField::build_well() {
         gameGrid[WELL_HEIGHT - 1][i] = GREY;
 }
 
+// ---- Block movement ---- //
 void playField::rotate(bool left) {
     iBlock rotated = iBlock(-1); // Produces empty iBlock
     rotated.id = currentBlock.id;
@@ -158,6 +163,39 @@ void playField::rotate(bool left) {
     std::memcpy(&currentBlock.blocks.grid, &rotated.blocks.grid, sizeof(color_block_t) * BLOCK_SIZE * BLOCK_SIZE);
 }
 
+void playField::move_left() {
+    --currentX;
+    if (check_collision())
+        ++currentX;
+}
+
+void playField::move_right() {
+    ++currentX;
+    if (check_collision())
+        --currentX;
+}
+
+bool playField::move_down() {
+    ++currentY;
+    if (check_collision()) {
+        settle_block();
+        return false;
+    }
+    return true;
+}
+
+void playField::hard_down() {
+    while (move_down());
+}
+// ---- END Block movement ---- //
+
+void playField::settle_block() {
+    for (short i = 0; i < BLOCK_SIZE; ++i)
+        for (short j = 0; j < BLOCK_SIZE; ++j)
+            if (currentBlock.blocks.grid[i][j] != EMPTY)
+                gameGrid[currentX + i][currentY + j - 1] = currentBlock.blocks.grid[i][j];
+}
+
 bool playField::check_collision() const {
     for (short j = BLOCK_SIZE - 1; j >= 0; --j)
         for (short i = 0; i < BLOCK_SIZE; ++i)
@@ -166,7 +204,7 @@ bool playField::check_collision() const {
     return false;
 }
 
-bool playField::full_row(short r) const {
+bool playField::check_full_row(short r) const {
     for (short j = 1; j < WELL_WIDTH - 1; ++j)
         if (gameGrid[r][j] == EMPTY)
             return false;
@@ -181,6 +219,10 @@ void playField::clear_row(short r) {
         gameGrid[0][j] = EMPTY;
 }
 
+void playField::new_block() {
+    
+}
+
 color_block_t playField::block_at(short x, short y) const {
     return gameGrid[x][y];
 }
@@ -191,5 +233,21 @@ color_block_t playField::block_at(short x, short y) const {
 
 sidebar::sidebar()
  : score(0), nextBlock(iBlock()) {};
+
+int sidebar::bump_score() {
+    return score += 10;
+}
+
+int sidebar::get_score() const {
+    return score;
+}
+
+short sidebar::get_nextBlock_id() const {
+    return nextBlock.get_id();
+}
+
+void sidebar::new_block() {
+    nextBlock = iBlock();
+}
 
 /////// END sidebar stuff ///////
