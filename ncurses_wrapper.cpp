@@ -48,8 +48,10 @@ void instantialize_color_pairs() {
 }
 
 ncurses_wrapper::ncurses_wrapper()
- : field(create_window(WELL_HEIGHT, WELL_WIDTH, 1, SIDEBAR_WIDTH + 1)),
-   bar(create_window(WELL_HEIGHT, SIDEBAR_WIDTH, 1, 0)) {};
+ : field(create_window(WELL_HEIGHT, WELL_WIDTH, 1, SIDEBAR_WIDTH)),
+   bar(create_window(WELL_HEIGHT, SIDEBAR_WIDTH, 1, 0)) {
+   	instantialize_color_pairs();
+};
 
 ncurses_wrapper::~ncurses_wrapper() {
 	delwin(field);
@@ -68,7 +70,7 @@ void ncurses_wrapper::draw_currentBlock(playField &pf) {
 	for (short i = 0; i < BLOCK_SIZE; ++i)
 		for (short j = 0; j < BLOCK_SIZE; ++j)
 			if (blocks.grid[i][j] != EMPTY)
-				mvwaddch( bar, pf.currentX + i, pf.currentY + j, '#' | COLOR_PAIR(get_color(blocks.grid[i][j])) );
+				mvwaddch( field, pf.currentY + i, pf.currentX + j, '#' | COLOR_PAIR(get_color(blocks.grid[i][j])) );
 }
 
 void ncurses_wrapper::draw_preview(sidebar &sb) {
