@@ -132,7 +132,11 @@ short iBlock::get_id() const {
 /////// playField stuff ///////
 
 playField::playField()
- : currentBlock(iBlock()), currentX(0), currentY(0) { build_well(); };
+ : currentBlock(iBlock()), currentY(0) {
+    std::srand(time(0));
+    currentX = std::rand() % (WELL_WIDTH - 4) + 1;
+    build_well();
+};
 
 void playField::build_well() {
     clear_grid();
@@ -154,9 +158,9 @@ void playField::rotate(bool left) {
     for (short i = 0; i < BLOCK_SIZE; ++i){ // rotates original onto copy
         for (short j = 0; j < BLOCK_SIZE; ++j) {
             if (left)
-                rotated.blocks.grid[i][j] = currentBlock.blocks.grid[3-j][i];
-            else
                 rotated.blocks.grid[i][j] = currentBlock.blocks.grid[j][3-i];
+            else
+                rotated.blocks.grid[i][j] = currentBlock.blocks.grid[3-j][i];
         }
     }
 
@@ -166,7 +170,7 @@ void playField::rotate(bool left) {
     // if this rotates it off the grid or onto another piece, we need to move it back
     for (short i = 0; i < BLOCK_SIZE; ++i)
         for (short j = 0; j < BLOCK_SIZE; ++j)
-            if (rotated.blocks.grid[i][j] != EMPTY)
+            if (rotated.blocks.grid[i][j] != EMPTY && gameGrid[i + currentY][j + currentX] != EMPTY)
                 return;
 
     std::memcpy(&currentBlock.blocks.grid, &rotated.blocks.grid, sizeof(color_block_t) * BLOCK_SIZE * BLOCK_SIZE);
@@ -201,7 +205,7 @@ void playField::settle_block() {
     for (short i = 0; i < BLOCK_SIZE; ++i)
         for (short j = 0; j < BLOCK_SIZE; ++j)
             if (currentBlock.blocks.grid[i][j] != EMPTY)
-                gameGrid[currentX + i][currentY + j - 1] = currentBlock.blocks.grid[i][j];
+                gameGrid[currentY + i - 1][currentX + j] = currentBlock.blocks.grid[i][j];
 }
 // ---- END Block movement ---- //
 
@@ -214,7 +218,7 @@ void playField::clear_grid() {
 bool playField::check_collision() const {
     for (short j = BLOCK_SIZE - 1; j >= 0; --j)
         for (short i = 0; i < BLOCK_SIZE; ++i)
-            if (currentBlock.blocks.grid[i][j] != EMPTY && gameGrid[currentX + i][currentY + j] != EMPTY)
+            if (currentBlock.blocks.grid[i][j] != EMPTY && gameGrid[currentY + i][currentX + j] != EMPTY)
                 return true;
     return false;
 }
@@ -234,15 +238,27 @@ void playField::clear_row(short r) {
         gameGrid[0][j] = EMPTY;
 }
 
+short playField::check_and_clear_rows() {
+    short rowsCleared = 0;
+    for (short i = 0; i < WELL_HEIGHT - 1; ++i) {
+        if (check_full_row(i)) {
+            clear_row(i);
+            ++rowsCleared;
+            --i;
+        }
+    }
+    return rowsCleared;
+}
+
 void playField::new_block() {
     currentBlock = iBlock();
-    currentX = std::rand() % (WELL_WIDTH - 2) + 1;
+    currentX = std::rand() % (WELL_WIDTH - 4) + 1;
     currentY = 0;
 }
 
 void playField::new_block(short nextBlockId) {
     currentBlock = iBlock(nextBlockId);
-    currentX = std::rand() % (WELL_WIDTH - 2) + 1;
+    currentX = std::rand() % (WELL_WIDTH - 4) + 1;
     currentY = 0;
 }
 
@@ -262,6 +278,13 @@ short playField::get_currentY() const {
     return currentY;
 }
 
+bool playField::check_gameover() const {
+    for (short j = 1; j < WELL_WIDTH - 1; ++j)
+        if (gameGrid[0][j] != EMPTY)
+            return true;
+    return false;
+}
+
 /////// END playField stuff ///////
 
 ///////// sidebar stuff ///////
@@ -269,8 +292,12 @@ short playField::get_currentY() const {
 sidebar::sidebar()
  : score(0), nextBlock(iBlock()) {};
 
-int sidebar::bump_score() {
+ int sidebar::bump_score() {
     return score += 10;
+}
+
+int sidebar::bump_score(short rows) {
+    return score += 10 * rows;
 }
 
 void sidebar::new_block() {
@@ -326,9 +353,18 @@ void tetrisGame::clear_row(short r) {
     sbar.bump_score();
 }
 
+void tetrisGame::clear_rows() {
+    short scoreMod = well.check_and_clear_rows();
+    sbar.bump_score(scoreMod);
+}
+
 void tetrisGame::new_block() {
     well.new_block(sbar.get_nextBlock_id());
     sbar.new_block();
+}
+
+bool tetrisGame::check_gameover() const {
+    return well.check_gameover();
 }
 
 /////// END tetrisGame stuff ///////
