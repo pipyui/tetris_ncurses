@@ -77,6 +77,7 @@ public:
     bool check_collision() const;
     bool check_full_row(short) const;
     void clear_row(short);
+    short check_and_clear_rows();
     void new_block();
     void new_block(short);
 
@@ -84,6 +85,7 @@ public:
     iBlock get_currentBlock() const;
     short get_currentX() const;
     short get_currentY() const;
+    bool check_gameover() const;
 };
 
 class sidebar {
@@ -95,6 +97,7 @@ public:
     sidebar();
     //~sidebar();
     int bump_score();
+    int bump_score(short);
     void new_block();
 
     int get_score() const;
@@ -119,7 +122,9 @@ public:
 
 
     void clear_row(short);
+    void clear_rows();
     void new_block();
+    bool check_gameover() const;
 };
 
 #endif
