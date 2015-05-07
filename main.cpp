@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 	cbreak();	// Line buffering disabled.
 	keypad(stdscr, TRUE);
 	noecho();
+	timeout(500);
 	start_color();
 	refresh();
 
@@ -50,7 +51,7 @@ int main(int argc, char *argv[])
 					skip = true;
 					break;
 				default:
-					skip = true;
+					//skip = true;
 					break;
 			}
 			if (! skip &&! testgame.move_down()) {
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 			if (testgame.check_gameover()) {
 				mvprintw(WELL_HEIGHT / 2, (WELL_WIDTH + SIDEBAR_WIDTH) / 2 - 3, "GAME OVER!");
 				gameover = true;
+				timeout( 500 - testgame.get_score() * 20 );
 			}
 
 			ncurses.draw_playField(testgame.well);
@@ -75,7 +77,6 @@ int main(int argc, char *argv[])
 				ncurses.draw_sidebar(testgame.sbar);
 				refresh();
 			}
-
 		}
 	}
 		
