@@ -125,6 +125,7 @@ public:
     void clear_rows();
     void new_block();
     bool check_gameover() const;
+    int get_score() const;
 };
 
 #endif
