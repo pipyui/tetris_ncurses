@@ -367,4 +367,8 @@ bool tetrisGame::check_gameover() const {
     return well.check_gameover();
 }
 
+int tetrisGame::get_score() const {
+    return sbar.get_score();
+}
+
 /////// END tetrisGame stuff ///////
