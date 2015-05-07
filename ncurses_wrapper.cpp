@@ -3,6 +3,8 @@
 #include <ncurses.h>
 
 
+constexpr char block_char = '#';
+
 WINDOW* create_window(int height, int width, int starty, int startx) {
 	WINDOW *new_window;
 
@@ -62,7 +64,7 @@ void ncurses_wrapper::draw_settled(playField &pf) {
 	for (short i = 0; i < WELL_HEIGHT - 1; ++i)
 		for (short j = 1; j < WELL_WIDTH - 1; ++j)
 			if (pf.gameGrid[i][j] != EMPTY)
-				mvwaddch( field, i, j, '#' | COLOR_PAIR(get_color(pf.gameGrid[i][j])) );
+				mvwaddch( field, i, j, block_char | COLOR_PAIR(get_color(pf.gameGrid[i][j])) );
 }
 
 void ncurses_wrapper::draw_currentBlock(playField &pf) {
@@ -70,7 +72,7 @@ void ncurses_wrapper::draw_currentBlock(playField &pf) {
 	for (short i = 0; i < BLOCK_SIZE; ++i)
 		for (short j = 0; j < BLOCK_SIZE; ++j)
 			if (blocks.grid[i][j] != EMPTY)
-				mvwaddch( field, pf.currentY + i, pf.currentX + j, '#' | COLOR_PAIR(get_color(blocks.grid[i][j])) );
+				mvwaddch( field, pf.currentY + i, pf.currentX + j, block_char | COLOR_PAIR(get_color(blocks.grid[i][j])) );
 }
 
 void ncurses_wrapper::draw_preview(sidebar &sb) {
@@ -79,7 +81,7 @@ void ncurses_wrapper::draw_preview(sidebar &sb) {
 	for (short i = 0; i < BLOCK_SIZE; ++i)
 		for (short j = 0; j < BLOCK_SIZE; ++j)
 			if (preview.grid[i][j] != EMPTY)
-				mvwaddch( bar, i + 3, j + SIDEBAR_WIDTH / 2 - 2, '#' | COLOR_PAIR(get_color(preview.grid[i][j])) );
+				mvwaddch( bar, i + 3, j + SIDEBAR_WIDTH / 2 - 2, block_char | COLOR_PAIR(get_color(preview.grid[i][j])) );
 }
 
 void ncurses_wrapper::draw_playField(playField &pf) {
