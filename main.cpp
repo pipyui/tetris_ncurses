@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	cbreak();	// Line buffering disabled.
 	keypad(stdscr, TRUE);
 	noecho();
-	timeout(500);
+	timeout(400);
 	start_color();
 	refresh();
 
@@ -44,29 +44,36 @@ int main(int argc, char *argv[])
 					testgame.hard_down();
 					testgame.clear_rows();
 					testgame.new_block();
+					ncurses.draw_sidebar(testgame.sbar);
 					skip = true;
 					break;
 				case KEY_F(1):
 					testgame = tetrisGame();
+					ncurses.draw_sidebar(testgame.sbar);
 					skip = true;
+					break;
+				case ' ':
+					mvprintw(WELL_HEIGHT / 2, (WELL_WIDTH + SIDEBAR_WIDTH) / 2 - 2, "PAUSED");
+					move(0,0);
+					while (getch() != ' ');
 					break;
 				default:
 					//skip = true;
 					break;
 			}
-			if (! skip &&! testgame.move_down()) {
+			if (! skip && ! testgame.move_down()) {
 				testgame.clear_rows();
 				testgame.new_block();
+				ncurses.draw_sidebar(testgame.sbar);
 			}
 
 			if (testgame.check_gameover()) {
 				mvprintw(WELL_HEIGHT / 2, (WELL_WIDTH + SIDEBAR_WIDTH) / 2 - 3, "GAME OVER!");
+				move(0, 0);
 				gameover = true;
-				timeout( 500 - testgame.get_score() * 20 );
 			}
 
 			ncurses.draw_playField(testgame.well);
-			ncurses.draw_sidebar(testgame.sbar);
 			refresh();
 
 		} else {
