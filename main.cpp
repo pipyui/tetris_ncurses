@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 			}
 			if (! skip && ! testgame.move_down()) {
 				testgame.clear_rows();
+				timeout(400 - testgame.get_score() * 2);
 				testgame.new_block();
 				ncurses.draw_sidebar(testgame.sbar);
 			}
